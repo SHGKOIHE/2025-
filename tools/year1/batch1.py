@@ -12,7 +12,7 @@ fire = ic('cp/icon_fire.png')
 p1 = [('t', '투척', B, BL), ('t', ' — 화염' + N + '오버레이', M, BL), ('t', ' —', M, WH), ('br',),
       ('t', '화염 오버레이가 있는 공간의 오퍼레이터는 즉시', M, WH), ('i', fire), ('t', '를' + N + '입습니다.', M, WH)]
 p2 = [('t', '오퍼레이터가 화염 오버레이가 있는 공간에 진입하거나 그곳에서 행동을 끝낼' + N + '때마다', M, WH), ('i', fire), ('t', '를' + N + '입습니다.', M, WH)]
-run_card('cp', 'capitao', '전술 석궁 (TAC mk0)', [dict(runs=p1, x_first=970, x_rest=741, cy=422.5), dict(runs=p2, x_first=741, x_rest=741, cy=None, fixed_cy=False)], 745)
+run_card('cp', 'capitao', '전술 석궁 (TAC MK0)', [dict(runs=p1, x_first=970, x_rest=741, cy=422.5), dict(runs=p2, x_first=741, x_rest=741, cy=None, fixed_cy=False)], 745)
 # HIBANA (elite, pages 7-8) and HIBANA2 (pages 9-10)
 for d, n, ov in (('hb', 'hibana', {'WEAPONS': [597, 122, 723, 149]}), ('hb2', 'hibana2', None)):
     dest = ic(f'{d}/icon_destroy.png')
