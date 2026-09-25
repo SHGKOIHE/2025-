@@ -14,9 +14,9 @@ for d, c in cfg.items():
              dict(runs=p2, x_first=c['p2'][0], x_rest=c['p2'][2], cy=c['p2'][1], limit=c['p3'][1] - 30), dict(runs=p3, x_first=c['p3'][0], x_rest=c['p3'][0], cy=c['p3'][1])],
              c['frame'], title_icon=ic(f'{d}/icon_title.png'), label_override={'ACTION': c['a1'], 'ACTION2': c['a2']})
 # IANA
-p1 = [('t', 'IANA는 절대', M, WH), ('i', ic('ia/icon_pin.png')), ('t', '를 받지 않습니다.', M, WH)]
+p1 = [('t', 'IANA가', M, WH), ('i', ic('ia/icon_pin.png')), ('t', '를 받지 않습니다.', M, WH)]
 p2 = [('t', 'IANA는 추가 행동이 필요한 가젯의 특수 효과를 무시합니다.', M, WH)]
 p3 = [('t', 'IANA를 사격하는 상대 오퍼레이터는 타격 주사위를 굴리기 전에 주사위 1개를 제거해야 합니다. 추가 행동을 소비하여 이 효과를 무시할 수' + N + '있습니다.', M, WH)]
-run_card('ia', 'iana', '제미니 복제기', [dict(runs=p1, x_first=965, x_rest=965, cy=432, size=38, pitch=44, tracking=-0.5), dict(runs=p2, x_first=965, x_rest=791, cy=510, limit=619 - 8),
+run_card('ia', 'iana', '제미니 복제기', [dict(runs=p1, x_first=965, x_rest=965, cy=432), dict(runs=p2, x_first=965, x_rest=791, cy=510, limit=619 - 8),
          dict(runs=p3, x_first=965, x_rest=791, cy=648)], 860,
          label_override={'REACTION': [796, 409, 919, 445], 'REACTION2': [796, 487, 919, 523], 'REACTION3': [793, 628, 916, 664]}, force_size=40)
