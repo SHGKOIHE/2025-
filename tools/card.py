@@ -48,7 +48,7 @@ def build(bg_path, back, out, *, labels, title, paras, title_icon=None, team='�
     if 'DESTROY' in L:
         rep['파괴'] = draw_label(img, '파괴', F('Bold', 34), cf(hexc('#cecece')), right=L['DESTROY'][2], cy=c(L['DESTROY'])[1])
     rep[team] = draw_label(img, team, F('Regular', 37), cf(hexc(team_color)), left=L['TEAM'][0], cy=c(L['TEAM'])[1])
-    for k, word in (('ACTION', '행동'), ('ACTION2', '행동'), ('REACTION', '반응'), ('REACTION2', '반응')):
+    for k, word in (('ACTION', '행동'), ('ACTION2', '행동'), ('REACTION', '반응'), ('REACTION2', '반응'), ('REACTION3', '반응')):
         if k in L:
             rep[k] = draw_label(img, word, F('Bold', 34), WH, cx=c(L[k])[0], cy=c(L[k])[1])
     tf = F('Bold', 56); tcx, tcy, tcol = title['cx'], title['cy'], cf(hexc(title['color']))
@@ -62,7 +62,7 @@ def build(bg_path, back, out, *, labels, title, paras, title_icon=None, team='�
     for et in extra_titles:
         rep['title2'] = draw_label(img, et['text'], tf, cf(hexc(et['color'])), cx=et.get('cx', 1086), cy=et['cy'])
     for i, p in enumerate(paras):
-        tr = p.get('tracking', 0.0); size = p.get('size', 40); pitch = p.get('pitch', PITCH[size])
+        tr = p.get('tracking', 0.0); size = p.get('size', 40); pitch = p.get('pitch') or PITCH.get(size, round(size * 1.15))
         lines = layout(p['runs'], x_first=p['x_first'], x_rest=p['x_rest'], right=p.get('right', 1460), size=size, tracking=tr)
         ext = render_lines(img, lines, cy_first=p['cy'], pitch=pitch, size=size, tracking=tr, colorfn=cf, iconfn=icf)
         rep[f'p{i}'] = dict(size=size, pitch=pitch, lines=len(lines), maxw=round(max(e[1] for e in ext)), bottom=round(p['cy'] + (len(lines)-1)*pitch + size*0.55))
