@@ -9,7 +9,7 @@ def run_card(dirn, name, title_text, paras, bottom_limit, title_icon=None, label
     if label_override: L.update(label_override)
     atk = 'ATTACKER' in L
     labels = dict(WEAPONS=L['WEAPONS'], RANGE=L['RANGE'], RUN=L['RUN'], DESTROY=L['DESTROY'], TEAM=L['ATTACKER' if atk else 'DEFENDER'])
-    for k in ('ACTION', 'REACTION'):
+    for k in ('ACTION', 'REACTION', 'ACTION2', 'REACTION2'):
         if k in L: labels[k] = L[k]
     t = L['title']
     title = dict(text=title_text, cx=1086, cy=(t[1]+t[3])/2, color=L['title_color'])
