@@ -42,3 +42,20 @@ def extract_icon_keep_images(src_pdf, pno, rect_px, keep_xrefs, pad=3, scale=1.0
     d = fitz.open('pdf', buf.getvalue())
     r = fitz.Rect(rect_px[0]-pad, rect_px[1]-pad, rect_px[2]+pad, rect_px[3]+pad)
     return d[pno].get_pixmap(matrix=fitz.Matrix(S*scale, S*scale), clip=px2pt(r), alpha=True)
+
+def save_crop(pix, path):
+    from PIL import Image
+    pix.save(path); im = Image.open(path).convert('RGBA'); im = im.crop(im.getchannel('A').getbbox()); im.save(path); return im.size
+
+def extract_die(src_pdf, pno, rect_px, keep_xrefs, scale=1.0, path=None):
+    """Image-piece die icon clipped to its vector outline alpha."""
+    import numpy as np
+    from PIL import Image
+    full = extract_icon_keep_images(src_pdf, pno, rect_px, keep_xrefs, scale=scale)
+    vec = extract_vector_icon(src_pdf, pno, rect_px, scale=scale)
+    a = np.frombuffer(full.samples, np.uint8).reshape(full.height, full.width, 4).copy()
+    v = np.frombuffer(vec.samples, np.uint8).reshape(vec.height, vec.width, 4)
+    a[..., 3] = np.minimum(a[..., 3], v[..., 3])
+    im = Image.fromarray(a, 'RGBA'); im = im.crop(im.getchannel('A').getbbox())
+    if path: im.save(path)
+    return im
