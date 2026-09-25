@@ -42,3 +42,21 @@ def remove_engraved_text(img_png, out_png, rects, thr=35, dil=2, ref='row'):
         total += int(m.sum())
     Image.fromarray(np.clip(np.round(a), 0, 255).astype(np.uint8)).save(out_png)
     return total
+
+def inpaint_white_text(img_png, out_png, rect, min_v=150, max_sat=40, dil=2, iters=600):
+    """Mask near-white low-saturation pixels in rect (baked text), dilate, fill by diffusion from surroundings."""
+    a = np.array(Image.open(img_png).convert('RGB')).astype(float)
+    x0, y0, x1, y1 = rect
+    R = a[y0:y1, x0:x1]
+    mx = R.max(2); mn = R.min(2)
+    m = (mn > min_v) & (mx - mn < max_sat)
+    for _ in range(dil):
+        mm = m.copy(); mm[1:] |= m[:-1]; mm[:-1] |= m[1:]; mm[:, 1:] |= m[:, :-1]; mm[:, :-1] |= m[:, 1:]; m = mm
+    F = R.copy()
+    for _ in range(iters):
+        P = np.pad(F, ((1, 1), (1, 1), (0, 0)), mode='edge')
+        avg = (P[:-2, 1:-1] + P[2:, 1:-1] + P[1:-1, :-2] + P[1:-1, 2:]) / 4
+        F[m] = avg[m]
+    a[y0:y1, x0:x1] = F
+    Image.fromarray(np.clip(np.round(a), 0, 255).astype(np.uint8)).save(out_png)
+    return int(m.sum())

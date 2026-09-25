@@ -9,7 +9,9 @@ PITCH = {40: 46, 42: 48, 44: 51}
 def fit_size(paras, bottom_limit, right=1460, margin=24):
     """Largest of 44/42/40 where every paragraph fits width and the last one ends >= margin above bottom_limit.
     Paragraphs after the first follow the previous one (cy = prev last line + pitch + 24) unless they carry a fixed cy."""
-    for size in (44, 42, 40):
+    for size in (44, 42, 40, 'fallback'):
+        force = size == 'fallback'
+        if force: size = 40
         pitch = PITCH[size]; ok = True; out = []; prev_end = None
         for p in paras:
             cy = p['cy'] if p.get('fixed_cy', True) or prev_end is None else prev_end + pitch + 24
@@ -19,9 +21,11 @@ def fit_size(paras, bottom_limit, right=1460, margin=24):
             if w > right: ok = False
             if 'limit' in p and end + size*0.55 > p['limit']: ok = False
             out.append(dict(p, size=size, cy=cy)); prev_end = end
+        if force:
+            print('WARNING: does not fit even at 40', [(o['cy']) for o in out], prev_end + size*0.55, bottom_limit)
+            return size, out
         if ok and prev_end + size*0.55 <= bottom_limit - margin:
             return size, out
-    return 40, [dict(p, size=40) for p in paras]
 
 def _line_w(line, size):
     start, words = line
