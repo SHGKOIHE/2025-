@@ -23,3 +23,22 @@ def remove_baked_text(clean_png, under_png, rect, out_png, thr=28, iters=400):
     c[y0:y1, x0:x1][m] = (u[y0:y1, x0:x1] + F)[m]
     Image.fromarray(np.clip(np.round(c), 0, 255).astype(np.uint8)).save(out_png)
     return int(m.sum())
+
+def remove_engraved_text(img_png, out_png, rects, thr=35, dil=2, ref='row'):
+    """Bright letters baked into a flat region: pixels brighter than the row median by thr (dilated) are
+    replaced with the row median colour of the unmasked pixels in that row."""
+    a = np.array(Image.open(img_png).convert('RGB')).astype(float)
+    total = 0
+    for (x0, y0, x1, y1) in rects:
+        R = a[y0:y1, x0:x1]; L = R.mean(2)
+        base = np.median(L, axis=1, keepdims=True) if ref == 'row' else np.median(L)
+        m = L > base + thr
+        for _ in range(dil):
+            mm = m.copy(); mm[1:] |= m[:-1]; mm[:-1] |= m[1:]; mm[:, 1:] |= m[:, :-1]; mm[:, :-1] |= m[:, 1:]; m = mm
+        for y in range(R.shape[0]):
+            if m[y].any():
+                src = R[y][~m[y]] if (~m[y]).sum() > 3 else R[~m]
+                R[y][m[y]] = np.median(src, axis=0)
+        total += int(m.sum())
+    Image.fromarray(np.clip(np.round(a), 0, 255).astype(np.uint8)).save(out_png)
+    return total
