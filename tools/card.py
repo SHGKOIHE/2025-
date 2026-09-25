@@ -4,6 +4,30 @@ from PIL import Image
 import numpy as np
 ALPHA = np.array(Image.open('/home/user/2025-/ace_first_front.png'))[..., 3]
 WH = (255, 255, 255)
+PITCH = {40: 46, 42: 48, 44: 51}
+
+def fit_size(paras, bottom_limit, right=1460, margin=24):
+    """Largest of 44/42/40 where every paragraph fits width and the last one ends >= margin above bottom_limit.
+    Paragraphs after the first follow the previous one (cy = prev last line + pitch + 24) unless they carry a fixed cy."""
+    for size in (44, 42, 40):
+        pitch = PITCH[size]; ok = True; out = []; prev_end = None
+        for p in paras:
+            cy = p['cy'] if p.get('fixed_cy', True) or prev_end is None else prev_end + pitch + 24
+            lines = layout(p['runs'], x_first=p['x_first'], x_rest=p['x_rest'], right=right, size=size)
+            w = max(_line_w(l, size) for l in lines)
+            end = cy + (len(lines)-1)*pitch
+            if w > right: ok = False
+            if 'limit' in p and end + size*0.55 > p['limit']: ok = False
+            out.append(dict(p, size=size, cy=cy)); prev_end = end
+        if ok and prev_end + size*0.55 <= bottom_limit - margin:
+            return size, out
+    return 40, [dict(p, size=40) for p in paras]
+
+def _line_w(line, size):
+    start, words = line
+    word, sp, x = words[-1]
+    from typeset import _word_w
+    return x + _word_w(word, size, 0.0)
 
 def build(bg_path, back, out, *, labels, title, paras, title_icon=None, team='공격팀', team_color='#3676b9'):
     """labels: dict of ink boxes from original. paras: list of dict(runs, x_first, x_rest, cy, right, tracking)."""
@@ -32,9 +56,10 @@ def build(bg_path, back, out, *, labels, title, paras, title_icon=None, team='�
         rep['title'] = draw_label(img, title['text'], tf, tcol, left=left, cy=tcy)
         img.alpha_composite(ic, (round(left + tw + 16), round(tcy - ic.height/2)))
     for i, p in enumerate(paras):
-        tr = p.get('tracking', 0.0)
-        lines = layout(p['runs'], x_first=p['x_first'], x_rest=p['x_rest'], right=p.get('right', 1460), tracking=tr)
-        rep[f'p{i}'] = render_lines(img, lines, cy_first=p['cy'], pitch=p.get('pitch', 46), tracking=tr, colorfn=cf, iconfn=icf)
+        tr = p.get('tracking', 0.0); size = p.get('size', 40); pitch = p.get('pitch', PITCH[size])
+        lines = layout(p['runs'], x_first=p['x_first'], x_rest=p['x_rest'], right=p.get('right', 1460), size=size, tracking=tr)
+        ext = render_lines(img, lines, cy_first=p['cy'], pitch=pitch, size=size, tracking=tr, colorfn=cf, iconfn=icf)
+        rep[f'p{i}'] = dict(size=size, pitch=pitch, lines=len(lines), maxw=round(max(e[1] for e in ext)), bottom=round(p['cy'] + (len(lines)-1)*pitch + size*0.55))
     a = np.array(img); a[..., 3] = ALPHA; a[ALPHA == 0, :3] = 0
     Image.fromarray(a, 'RGBA').save(out, dpi=(300, 300))
     return rep
