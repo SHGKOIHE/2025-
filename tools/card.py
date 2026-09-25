@@ -29,7 +29,7 @@ def _line_w(line, size):
     from typeset import _word_w
     return x + _word_w(word, size, 0.0)
 
-def build(bg_path, back, out, *, labels, title, paras, title_icon=None, team='공격팀', team_color='#3676b9'):
+def build(bg_path, back, out, *, labels, title, paras, title_icon=None, team='공격팀', team_color='#3676b9', extra_titles=()):
     """labels: dict of ink boxes from original. paras: list of dict(runs, x_first, x_rest, cy, right, tracking)."""
     img = Image.open(bg_path).convert('RGBA')
     cf = gray if back else (lambda c: c)
@@ -55,6 +55,8 @@ def build(bg_path, back, out, *, labels, title, paras, title_icon=None, team='�
         total = tw + 16 + ic.width; left = tcx - total/2
         rep['title'] = draw_label(img, title['text'], tf, tcol, left=left, cy=tcy)
         img.alpha_composite(ic, (round(left + tw + 16), round(tcy - ic.height/2)))
+    for et in extra_titles:
+        rep['title2'] = draw_label(img, et['text'], tf, cf(hexc(et['color'])), cx=et.get('cx', 1086), cy=et['cy'])
     for i, p in enumerate(paras):
         tr = p.get('tracking', 0.0); size = p.get('size', 40); pitch = p.get('pitch', PITCH[size])
         lines = layout(p['runs'], x_first=p['x_first'], x_rest=p['x_rest'], right=p.get('right', 1460), size=size, tracking=tr)

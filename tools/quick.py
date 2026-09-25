@@ -3,7 +3,7 @@ import sys, os, json
 sys.path.insert(0, os.path.dirname(__file__))
 from card import *
 
-def run_card(dirn, name, title_text, paras, bottom_limit, title_icon=None, label_override=None, team=None, team_color=None):
+def run_card(dirn, name, title_text, paras, bottom_limit, title_icon=None, label_override=None, team=None, team_color=None, extra_titles=()):
     info = json.load(open(f'{dirn}/info.json'))
     L = dict(info['labels'])
     if label_override: L.update(label_override)
@@ -17,7 +17,7 @@ def run_card(dirn, name, title_text, paras, bottom_limit, title_icon=None, label
     rep = None
     for k, back in ((0, False), (1, True)):
         r = build(f'{dirn}/bg_{k}.png', back, f'{dirn}/{name}_{"back" if back else "front"}.png', labels=labels, title=title, paras=paras,
-                  title_icon=title_icon, team=team or ('공격팀' if atk else '방어팀'), team_color=team_color or ('#3676b9' if atk else '#e66a14'))
+                  title_icon=title_icon, extra_titles=extra_titles, team=team or ('공격팀' if atk else '방어팀'), team_color=team_color or ('#3676b9' if atk else '#e66a14'))
         if not back: rep = r
     print(name, 'size', size, {k: v for k, v in rep.items() if k.startswith('p')})
     return rep
