@@ -59,3 +59,25 @@ def strip_pages(src, pages, dst, keep=default_keep):
             del pdf.pages[i]
     pdf.save(dst)
     return log
+
+def remove_image_do(src, dst, xrefs, pages=None):
+    """Remove 'Do' ops that paint image XObjects with the given object numbers (recursing into forms)."""
+    pdf = pikepdf.open(src)
+    def walk(obj, res):
+        ops = pikepdf.parse_content_stream(obj); out = []
+        for operands, op in ops:
+            if str(op) == 'Do' and res is not None and '/XObject' in res:
+                xo = res.XObject.get(operands[0])
+                if xo is not None:
+                    if xo.get('/Subtype') == '/Image' and xo.objgen[0] in xrefs:
+                        continue
+                    if xo.get('/Subtype') == '/Form':
+                        walk(xo, xo.get('/Resources', res))
+            out.append((operands, op))
+        data = pikepdf.unparse_content_stream(out)
+        if isinstance(obj, pikepdf.Page): obj.Contents = pdf.make_stream(data)
+        else: obj.write(data)
+    for i, pg in enumerate(pdf.pages):
+        if pages is None or i in pages:
+            walk(pg, pg.Resources)
+    pdf.save(dst)
