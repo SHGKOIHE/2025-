@@ -18,5 +18,5 @@ run_card('fk', 'finka', '아드레날린 분출', [dict(runs=p1, x_first=981, x_
 pin = ic('ln/icon_pin.png')
 p1 = [('t', '드론', B, BL), ('t', ' — EE-ONE-D는 이동력 포인트를 10개까지 소비할 수 있습니다. 스캔을 완료하면 드론이 이동을 완료한 공간에 EE-ONE-D' + N + '토큰을 놓습니다.', M, WH)]
 p2 = [('t', 'EE-ONE-D 토큰이 있는 방의 공간에 진입하거나, 그곳에서 행동을 끝낸 상대' + N + '오퍼레이터는', M, WH), ('i', pin), ('t', '를' + N + '받습니다.', M, WH)]
-run_card('ln', 'lion', '드론 (EE-ONE-D)', [dict(runs=p1, x_first=996, x_rest=716, cy=440.5), dict(runs=p2, x_first=762, x_rest=762, cy=None, fixed_cy=False)], 812,
+run_card('ln', 'lion', 'EE-ONE-D 드론', [dict(runs=p1, x_first=996, x_rest=716, cy=440.5), dict(runs=p2, x_first=762, x_rest=762, cy=None, fixed_cy=False)], 812,
          title_icon=ic('ln/icon_title.png'), label_override={'ACTION': [811, 420, 903, 454]})
