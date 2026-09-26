@@ -1,5 +1,5 @@
-"""Lay out card fronts/backs on A4 landscape (4 per sheet, actual size 126x90 mm at 300dpi) with crop marks.
-Back pages mirror the column order so fronts and backs line up when printed duplex (flip on short edge)."""
+"""Lay out cards on A4 landscape (actual size 126x90 mm at 300dpi) with crop marks, single-sided.
+Each row holds one operator: front on the left, back on the right (2 operators per sheet)."""
 import os, sys
 from PIL import Image, ImageDraw
 import numpy as np
@@ -48,10 +48,11 @@ def page(cards, back):
 
 def build(names, out, quality=92):
     pages = []
-    for i in range(0, len(names), 4):
-        grp = names[i:i + 4]
-        pages.append(page([card(find(n, 'front')) for n in grp], False))
-        pages.append(page([card(find(n, 'back')) for n in grp], True))
+    for i in range(0, len(names), 2):
+        cards = []
+        for n in names[i:i + 2]:
+            cards += [card(find(n, 'front')), card(find(n, 'back'))]
+        pages.append(page(cards, False))
     pages[0].save(out, save_all=True, append_images=pages[1:], resolution=DPI, quality=quality)
     return len(pages)
 
