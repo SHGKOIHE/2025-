@@ -1,4 +1,4 @@
-"""Lay out cards on A4 landscape (actual size 126x90 mm at 300dpi) with crop marks, single-sided.
+"""Lay out cards on A4 landscape (actual size 120x90 mm at 300dpi) with crop marks, single-sided.
 Each row holds one operator: front on the left, back on the right (2 operators per sheet)."""
 import os, sys
 from PIL import Image, ImageDraw
@@ -15,11 +15,11 @@ ORDER = ['ash', 'blitz', 'fuze', 'glaz', 'iq', 'montagne', 'sledge', 'thatcher',
 DPI = 300
 MM = DPI / 25.4
 PAGE = (round(297 * MM), round(210 * MM))
-BOX = (61, 89, 1550, 1152)            # card outline inside the 1590x1236 PNG (ACE alpha bbox)
+BOX = (96, 89, 1514, 1152)            # 120x90 mm card outline inside the 1590x1236 PNG (output_120 mask)
 GAP = round(4 * MM)
 
 def find(name, side):
-    for d in ('output', '.'):
+    for d in ('output_120',):
         p = os.path.join(ROOT, d, f'{name}_{side}.png')
         if os.path.exists(p): return p
     raise FileNotFoundError(name)
