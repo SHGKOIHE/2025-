@@ -18,7 +18,7 @@ def new_mask():
     remask.Y0 = round(cy - 531.5); remask.Y1 = remask.Y0 + 1062
     return remask.mask()
 
-def run(inputs, outdir):
+def run(inputs, outdir, bleed_dir=None):
     M = new_mask(); os.makedirs(outdir, exist_ok=True); docs = {}
     cx = (OLD[0] + OLD[2] + 1) / 2; cy = (OLD[1] + OLD[3] + 1) / 2
     for path in inputs:
@@ -35,6 +35,8 @@ def run(inputs, outdir):
         small = img.resize((sw, sh), Image.LANCZOS)
         canvas = Image.fromarray(ref.astype(np.uint8))   # background for any uncovered border
         canvas.paste(small, (round(cx - cx * F), round(cy - cy * F)))
+        if bleed_dir:
+            os.makedirs(bleed_dir, exist_ok=True); canvas.save(os.path.join(bleed_dir, base + '.png'), dpi=(300, 300))
         out = np.array(canvas.convert('RGBA')); out[..., 3] = M; out[M == 0, :3] = 0
         Image.fromarray(out, 'RGBA').save(os.path.join(outdir, base + '.png'), dpi=(300, 300))
     return M
